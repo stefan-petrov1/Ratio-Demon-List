@@ -1,0 +1,17 @@
+{
+  "name": "ratio-demon-list",
+  "version": "1.0.0",
+  "description": "This is a project for me and my friends for their geometry dash demon list",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefan-petrov1/Ratio-Demon-List.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stefan-petrov1/Ratio-Demon-List/issues"
+  },
+  "homepage": "https://github.com/stefan-petrov1/Ratio-Demon-List#readme"
+}
