@@ -3,10 +3,10 @@ export interface ISongInput {
 }
 
 export interface ISongParsed {
-  songName: string;
-  songAuthor: string;
-  songID: number;
-  songLink?: string;
+  name: string;
+  author: string;
+  id: number;
+  link?: string;
 }
 
 export interface ILevelInfo {
@@ -14,7 +14,7 @@ export interface ILevelInfo {
 }
 
 export interface ILevel {
-  id: number;
+  levelId: number;
   name: string;
   description: string;
   author: string;
@@ -24,4 +24,15 @@ export interface ILevel {
   password: string;
   objects: number;
   song: ISongParsed;
+  video?: string;
+  demonList?: IParsedDemonListData;
+  position?: number | string;
+}
+
+export interface IParsedDemonListData {
+  position: number;
+  requirement: number;
+  publisher: string;
+  verifier: string;
+  video?: string;
 }

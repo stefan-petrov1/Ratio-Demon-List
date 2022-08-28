@@ -1,4 +1,5 @@
-import request, { Response } from 'request';
+import requester from '../utils/requestUtil';
+import { IReturnData, RequestMethods } from '../utils/requestUtil/types';
 
 /*
 ################################################ QUICK NOTE ################################################
@@ -31,17 +32,10 @@ export const gdRequest = async (
   target?: string,
   params = {},
   callback: Callback = () => {}
-) => {
+): Promise<IReturnData<string>> => {
   if (!target) return callback(true);
   const requestURL = `${baseUrl}/${target}.php`;
   const requestParams = parseGdParams(params);
 
-  return new Promise((resolve, reject) => {
-    request.post(requestURL, requestParams, (err, res: Response, body) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(body);
-    });
-  });
+  return requester<string>(RequestMethods.post, requestURL, requestParams);
 };

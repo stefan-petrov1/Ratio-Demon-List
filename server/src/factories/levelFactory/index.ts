@@ -1,3 +1,5 @@
+import { getPositionByName } from '../../services/demonListService/index';
+import { IPositionLevelData } from '../../services/demonListService/types';
 import xorFactory from '../xorFactory';
 import { TXor } from '../xorFactory/types';
 import {
@@ -6,7 +8,13 @@ import {
   levelLenghts,
   music,
 } from './constants';
-import { ILevel, ILevelInfo, ISongInput, ISongParsed } from './types';
+import {
+  ILevel,
+  ILevelInfo,
+  IParsedDemonListData,
+  ISongInput,
+  ISongParsed,
+} from './types';
 
 /*
 ################################################ QUICK NOTE ################################################
@@ -15,6 +23,23 @@ The link to GD Colon's project repo is: https://github.com/GDColon/GDBrowser.
 For any business problems or bugs please DM me via Discord at: StefanDP#6411.
 ################################################ QUICK NOTE ################################################
 */
+
+async function getDemonListData(
+  name: string
+): Promise<IParsedDemonListData | undefined> {
+  const data: IPositionLevelData[] = await getPositionByName(name);
+
+  if (!data.length) return undefined;
+  const levelData: IPositionLevelData = data[0];
+
+  return {
+    position: levelData.position,
+    requirement: levelData.requirement,
+    video: levelData.video,
+    publisher: levelData.publisher.name,
+    verifier: levelData.verifier.name,
+  };
+}
 
 function parseLevelDifficulty(levelInfo: ILevelInfo) {
   let difficulty = difficulties[levelInfo[9]] || 'Unrated';
@@ -47,18 +72,18 @@ function parseSong(
 ): ISongParsed {
   if (customSong) {
     return {
-      songName: songInfo[2] || 'Unknown',
-      songAuthor: songInfo[4] || 'Unknown',
-      songID: Number(songInfo[1]) || customSong,
-      songLink: decodeURIComponent(songInfo[10]),
+      name: songInfo[2] || 'Unknown',
+      author: songInfo[4] || 'Unknown',
+      id: Number(songInfo[1]) || customSong,
+      link: decodeURIComponent(songInfo[10]),
     };
   } else {
     const foundSong = music[officialSong] || { null: true };
 
     return {
-      songName: foundSong[0] || 'Unknown',
-      songAuthor: foundSong[1] || 'Unknown',
-      songID: officialSong,
+      name: foundSong[0] || 'Unknown',
+      author: foundSong[1] || 'Unknown',
+      id: officialSong,
     };
   }
 }
@@ -75,11 +100,14 @@ function parsePassword(password: string): string {
   return parsedPassword;
 }
 
-export default function levelFactory(
+export default async function levelFactory(
   levelInfo: ILevelInfo,
   songInfo: ISongInput,
-  authorArr: Array<string> = []
-): ILevel {
+  authorArr: Array<string> = [],
+  video?: string
+): Promise<ILevel> {
+  const name = levelInfo[2] || '-';
+
   const description =
     Buffer.from(levelInfo[3] || '', 'base64').toString() ||
     '(No description provided)';
@@ -87,14 +115,29 @@ export default function levelFactory(
   const officialSong = Number(levelInfo[35]) ? 0 : parseInt(levelInfo[12]) + 1;
   const customSong = Number(levelInfo[35]) || 0;
 
+  let demonListData: IParsedDemonListData | undefined = await getDemonListData(
+    name
+  );
+
+  if (demonListData) {
+    const { video: videoFromData, ...leftData } = demonListData;
+    demonListData = leftData;
+
+    if (!video && videoFromData) {
+      video = videoFromData;
+    }
+  }
+
   return {
-    id: Number(levelInfo[1]) || 0,
-    name: levelInfo[2] || '-',
+    levelId: Number(levelInfo[1]) || 0,
+    name,
     author: authorArr[1] || '-',
     description,
     difficulty: parseLevelDifficulty(levelInfo),
     password: parsePassword(levelInfo[27]),
     gameVersion: parseGameVersion(Number(levelInfo[13])),
+    video,
+    demonList: demonListData,
     length: levelLenghts[levelInfo[15]] || 'XL',
     objects: Number(levelInfo[45]) || 0,
     song: parseSong(customSong, officialSong, songInfo),

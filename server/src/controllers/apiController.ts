@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import ServerError from '../config/errors/ServerError';
 import levelFactory from '../factories/levelFactory';
 import { ILevel } from '../factories/levelFactory/types';
 import * as apiService from '../services/apiService';
@@ -8,12 +9,18 @@ export async function getLevelById(
   res: Response,
   next: NextFunction
 ) {
-  const levelId = req.params.id;
+  const levelId = Number(req.params.id.trim());
 
   try {
-    if (!levelId) throw new Error('Invalid ID');
+    if (!levelId) throw ServerError.badRequest('Invalid ID');
 
     const data = await apiService.getLevelById(levelId);
+    console.log(levelId, data);
+
+    // Data will be -1 as long as the ID is a number
+    if (data === '-1') {
+      throw ServerError.badRequest('Invalid ID');
+    }
 
     const splitBody: string[] = data.split('#');
 
@@ -24,7 +31,7 @@ export async function getLevelById(
     const levelInfo = preRes.find((x) => x.startsWith(`1:${levelId}`));
     const response = req.parseGdResponse(levelInfo, ':');
 
-    const level: ILevel = levelFactory(response, song, author);
+    const level: ILevel = await levelFactory(response, song, author);
     res.send(level);
   } catch (err) {
     next(err);
