@@ -8,7 +8,7 @@ export default class ServerError {
   }
 
   static badRequest(message: string) {
-    return new ServerError(message, 404);
+    return new ServerError(message, 400);
   }
 
   static serverError() {

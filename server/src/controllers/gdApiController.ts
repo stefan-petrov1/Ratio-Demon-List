@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import ServerError from '../config/errors/ServerError';
 import levelFactory from '../factories/levelFactory';
 import { ILevel } from '../factories/levelFactory/types';
-import * as apiService from '../services/apiService';
+import * as gdApiService from '../services/gdApiService';
 
 export async function getLevelById(
   req: Request,
@@ -14,7 +14,7 @@ export async function getLevelById(
   try {
     if (!levelId) throw ServerError.badRequest('Invalid ID');
 
-    const data = await apiService.getLevelById(levelId);
+    const data = await gdApiService.getLevelById(levelId);
     console.log(levelId, data);
 
     // Data will be -1 as long as the ID is a number
