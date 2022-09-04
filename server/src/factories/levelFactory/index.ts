@@ -103,10 +103,9 @@ function parsePassword(password: string): string {
 export default async function levelFactory(
   levelInfo: ILevelInfo,
   songInfo: ISongInput,
-  authorArr: Array<string> = [],
-  video?: string
+  authorArr: Array<string> = []
 ): Promise<ILevel> {
-  const name = levelInfo[2] || '-';
+  const name = (levelInfo[2] || '-').trim();
 
   const description =
     Buffer.from(levelInfo[3] || '', 'base64').toString() ||
@@ -119,11 +118,13 @@ export default async function levelFactory(
     name
   );
 
+  let video = undefined;
+
   if (demonListData) {
     const { video: videoFromData, ...leftData } = demonListData;
     demonListData = leftData;
 
-    if (!video && videoFromData) {
+    if (videoFromData) {
       video = videoFromData;
     }
   }

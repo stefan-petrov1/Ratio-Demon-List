@@ -7,11 +7,7 @@ import { IUser, User } from '../models/User';
 import { jwtSign } from '../utils/jwtUtils';
 
 export async function createUser(data: IUser) {
-  console.log(data);
-
   const user = await User.create(data);
-  console.log('created');
-
   return user.toObject();
 }
 

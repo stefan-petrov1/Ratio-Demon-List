@@ -31,7 +31,7 @@ export const authMiddleware = async (
 export const allowGuest = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated) {
     return next(
-      ServerError.badRequest('User must be logged out to perform this action')
+      ServerError.forbidden('User must be logged out to perform this action')
     );
   }
 
@@ -39,24 +39,33 @@ export const allowGuest = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const allowUser = (req: Request, res: Response, next: NextFunction) => {
-  if (!req.isAuthenticated) {
-    return next(
-      ServerError.badRequest('User must be logged in to perform this action')
-    );
+  if (nextIfUnauthenticated(req.isAuthenticated, next)) {
+    return;
   }
 
   next();
 };
 
 export const allowAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (
-    !req.isAuthenticated ||
-    (req.isAuthenticated && req.user.role !== UserRoles.Admin)
-  ) {
+  if (nextIfUnauthenticated(req.isAuthenticated, next)) {
+    return;
+  }
+
+  if (req.user.role !== UserRoles.Admin) {
     return next(
-      ServerError.badRequest('User must be an admin to perform this action')
+      ServerError.forbidden('User must be an admin to perform this action')
     );
   }
 
   next();
 };
+
+function nextIfUnauthenticated(isAuthenticated: boolean, next: NextFunction) {
+  if (!isAuthenticated) {
+    next(
+      ServerError.forbidden('Guest must be logged in to perform this action')
+    );
+
+    return true;
+  }
+}

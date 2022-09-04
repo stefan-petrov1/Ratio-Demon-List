@@ -11,6 +11,14 @@ export default class ServerError {
     return new ServerError(message, 400);
   }
 
+  static unauthorized(message: string) {
+    return new ServerError(message, 401);
+  }
+
+  static forbidden(message: string) {
+    return new ServerError(message, 403);
+  }
+
   static serverError() {
     return new ServerError('Internal Server Error', 500);
   }

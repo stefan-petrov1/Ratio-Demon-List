@@ -55,30 +55,22 @@ const userSchema = new Schema<IUser>({
 });
 
 userSchema.pre('validate', function (next) {
-  console.log('before email');
-
   if (this.email) {
     this.email = validator.normalizeEmail(this.email, {
       all_lowercase: true,
     }) as string;
   }
 
-  console.log('after email');
   if (this.password != this.rePassword) {
     this.invalidate('password', 'Passwords must match');
   }
 
-  console.log('after password');
   next();
 });
 
 userSchema.post('validate', async function () {
-  console.log('before role');
-
   this.role = UserRoles.User;
-  console.log('before password123');
   this.password = await bcrypt.hash(this.password, saltRounds);
-  console.log('after password123');
 });
 
 userSchema

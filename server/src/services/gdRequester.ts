@@ -11,12 +11,6 @@ For any business problems or bugs please DM me via Discord at: StefanDP#6411.
 
 const baseUrl = 'http://www.boomlings.com/database';
 
-type Callback = {
-  (error: boolean);
-  (response: any);
-  (body: any);
-};
-
 const defaultParams = {
   secret: 'Wmfd2893gb7',
   gameVersion: '21',
@@ -30,10 +24,10 @@ const parseGdParams = (params: Object) => {
 
 export const gdRequest = async (
   target?: string,
-  params = {},
-  callback: Callback = () => {}
+  params = {}
 ): Promise<IReturnData<string>> => {
-  if (!target) return callback(true);
+  if (!target) throw new Error('No target provided in gd request.');
+
   const requestURL = `${baseUrl}/${target}.php`;
   const requestParams = parseGdParams(params);
 

@@ -1,6 +1,6 @@
 import { gdRequest } from './gdRequester';
 
-export async function getLevelById(id: number): Promise<string> {
+export async function getLevelById(id: number | string): Promise<string> {
   const data = await gdRequest('getGJLevels21', {
     str: id,
     type: 0,

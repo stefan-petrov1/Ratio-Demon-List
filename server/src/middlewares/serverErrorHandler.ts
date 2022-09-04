@@ -21,7 +21,7 @@ export default function (
     const message = parseErrorMessage(error);
     const code = error instanceof ServerError ? error.code : 404;
 
-    return res.json({ code, message });
+    return res.status(code).json({ code, message });
   }
 
   logger.error(
@@ -30,5 +30,8 @@ export default function (
   );
 
   const newError = ServerError.serverError();
-  res.json({ status: newError.code, message: newError.message });
+
+  res
+    .status(newError.code)
+    .json({ status: newError.code, message: newError.message });
 }

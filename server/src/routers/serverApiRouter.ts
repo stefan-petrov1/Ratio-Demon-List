@@ -26,7 +26,6 @@ router.use(express.json());
 router.use(authMiddleware);
 
 // Level API
-router.get('/level/:id', serverLevelController.getLevelById);
 router.post('/level/new', allowAdmin, serverLevelController.createLevel);
 
 // Authentication API
